@@ -42,6 +42,7 @@
                document.getElementById('canvasList').width = getCanvasWidth()+15;               
               // alert(canvas.width);
                mainChart = new Scribl(canvas, getChartWidth());
+               mainChart.lanesSizes = 13;
                $("button").button(); 
                $("#scaleSlider").slider( { min: 3, max: 30, value: 15, slide: function(event, ui){ redraw() } });
           		$("#shapeSlider").slider( { min: 1, max: 20, value: 6, slide: function(event, ui){ redraw() } });
@@ -62,6 +63,7 @@
                var img = mainChart.canvas.toDataURL("image/png");
                // Add link to download image
                $("#export-image").attr('href', img);
+               $("#export-image").attr('target', '_blank');
             }
        		function getDas(name, source, chromosome, type, min, max, display) {
     
@@ -142,6 +144,7 @@
                var img = mainChart.canvas.toDataURL("image/png");
                // Add link to download image
                $("#export-image").attr('href', img);
+               $("#export-image").attr('target', '_blank');
     			}
 
              function getCanvasWidth(){return($(window).width() * .60);}
@@ -262,7 +265,68 @@
                       }
                    }
 
+               } else {
+                  initDropbox();
                }
+             }
+             
+             function initDropbox() {
+                var dropbox = document.getElementById('dropbox');
+          		if (!window.FileReader) {
+          		  dropbox.innerHTML = "<p>This browser doesnt support the File API</p>";
+          		} else {
+          		  // Page Layout
+
+          		  dropbox.innerHTML =
+          		    '<p>Drag a Genbank(.gb) or BED(.bed) file onto this area <input type="hidden" id="file" /></p>';
+
+          		  // Displays gene charts.
+          		  function displayChart(file) {
+          		    var reader = new FileReader();
+          			var fileType = /[^.]+$/.exec(file.name);
+
+          		   reader.onload = function(event) {
+          		      mainChart.laneSizes = 13;
+          				if (fileType == "bed") 
+          					mainChart.loadBed(event.target.result);
+          				else if (fileType == "gb")
+          					mainChart.loadGenbank(event.target.result);
+          				else
+          				 	alert("File must have a .gb or .bed extension");
+          				dropbox.style.display = 'none';
+          				mainChart.draw();		
+          		    };
+          		    reader.readAsText(file);
+          		  }		 
+
+          		  // Input handler
+          		  document.getElementById('file').onchange = function() {
+          		    displayFile(this.files[0]);
+          		  };
+
+          		  // Reduce movement by adding invisible border
+          		  dropbox.style.border = '4px solid transparent';
+
+          		  // Add dragging events
+          		  dropbox.ondragenter = function() {
+          		    dropbox.style.border = '4px solid #b1ecb3';
+          		    return false;
+          		  };
+
+          		  dropbox.ondragover = function() {
+          		    return false;
+          		  };
+
+          		  dropbox.ondragleave = function() {
+          		    return false;
+          		  };
+
+          		  dropbox.ondrop = function(event) {
+          		    dropbox.style.border = '4px solid transparent';
+          		    displayChart(event.dataTransfer.files[0]);
+          		    return false;
+          		  };
+          		}
              }
 
     		</script>
@@ -279,6 +343,7 @@
           <div id='canvasHolder' style="float:left; width: 82%">
                 <div id="canvasList">
                    <canvas id='canvas'></canvas>
+                   <div id='dropbox'></div>
                 </div>               
           </div>
           

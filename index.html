@@ -1,0 +1,327 @@
+<!DOCTYPE HTML>
+<html lang="en"> 
+
+<head> 
+
+    <title></title> 
+    <script src="js/Scribl.min.js"></script>
+      <!-- <script src="../Scribl/src/Scribl.class.js" ></script>
+      <script src="../Scribl/src/Scribl.js" ></script>
+      <script src="../Scribl/src/Scribl.track.js" ></script>
+      <script src="../Scribl/src/Scribl.lane.js" ></script>
+      <script src="../Scribl/src/Scribl.events.js" ></script>
+      <script src="../Scribl/src/Scribl.utils.js" ></script>
+      <script src="../Scribl/src/Scribl.svg.js" ></script>
+      <script src="../Scribl/src/Scribl.glyph.js" ></script>
+      <script src="../Scribl/src/glyph/Scribl.blockarrow.js" ></script>
+      <script src="../Scribl/src/glyph/Scribl.arrow.js" ></script>
+      <script src="../Scribl/src/glyph/Scribl.rect.js" ></script>
+      <script src="../Scribl/src/glyph/Scribl.line.js" ></script>
+      <script src="../Scribl/src/glyph/Scribl.complex.js" ></script> -->
+		
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+   <script src="js/mColorPicker_min.js"></script>
+   <!-- <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/> -->
+   <link href='http://fonts.googleapis.com/css?family=Amaranth:bold' rel='stylesheet' type='text/css'>
+   <!-- <link href='http://fonts.googleapis.com/css?family=Gruppo' rel='stylesheet' type='text/css'> -->
+   <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.13.redmond.css" />
+   <link rel="stylesheet" type="text/css" href="css/figure-builder.css" />
+   
+   <script src="js/jquery-ui.chase.min.js"></script>
+   <script src="js/jsdas.0.1.6.min.js" ></script>
+   
+    
+    <script type="text/javascript">    
+            var activeSeqs = 0;
+    		   var mainChart;	   
+
+    		   $(document).ready(function() {
+               
+               var canvas = document.getElementById('canvas');
+               canvas.width = getCanvasWidth();
+               document.getElementById('canvasList').width = getCanvasWidth()+15;               
+              // alert(canvas.width);
+               mainChart = new Scribl(canvas, getChartWidth());
+               $("button").button(); 
+               $("#scaleSlider").slider( { min: 3, max: 30, value: 15, slide: function(event, ui){ redraw() } });
+          		$("#shapeSlider").slider( { min: 1, max: 20, value: 6, slide: function(event, ui){ redraw() } });
+          		$("#trackSlider").slider( { min: 1, max: 200, value: 13, slide: function(event, ui){ redraw() } });
+               $('#color1').bind('colorpicked', function () { redraw(); });
+               $('#color2').bind('colorpicked', function () { redraw(); });
+               $('#scaleShow').bind('click', function () { redraw(); });
+               loadUrlQuery();            
+    		   });
+
+
+            function draw() {
+               mainChart.canvas.width = getCanvasWidth();
+               mainChart.laneSizes = 13;
+               mainChart.canvas.height = mainChart.getHeight();
+               document.getElementById('canvasList').width = getCanvasWidth()+15;
+               mainChart.draw();
+               var img = mainChart.canvas.toDataURL("image/png");
+               // Add link to download image
+               $("#export-image").attr('href', img);
+            }
+       		function getDas(name, source, chromosome, type, min, max, display) {
+    
+       				// get DAS data
+       				var url = source + '/features?segment=' + chromosome + ':' + min + "," + max + ';type=' + type;   				
+       				if(display == "Expand")
+       				   JSDAS.features(url, function(response) { addFeatures(response, "Expand") });
+       				else
+       				   JSDAS.features(url, function(response) { addFeatures(response, "Collapse") });
+
+             }           
+
+    		   function addFeatures(response, display) {
+    		      // set width again in case window wasn't loaded completely
+               mainChart.width = getChartWidth();
+               var track;
+               if (display == 'Expand')
+                  track = mainChart.addTrack();
+               else
+                  track = mainChart.addTrack().addLane();
+
+    				var features = response.GFF.SEGMENT[0].FEATURE;
+                if (!features) {
+                   // TODO add an error fetching message
+                   return; 
+                }
+                // features.sort( function(a,b){ return(b.position - a.position); });
+    				for (var i=0; i < features.length; i++) {
+    					var f = features[i];
+    					var start = parseInt(f.START.textContent);
+    					var length =  parseInt(f.END.textContent) - start;
+    					if (f.ORIENTATION) {
+    						orientation =  f.ORIENTATION.textContent;
+    						var glyph = track.addGene(start, length, orientation);
+    					} else
+    						var glyph = track.addFeature( new Rect( "rect", start, length) );
+
+    					if (f.TYPE.textContent) glyph.name = f.TYPE.textContent;
+    					if(f.LINK && f.LINK[0] && f.LINK[0].href) { 
+    						//glyph.onMouseover = f.TYPE.textContent + "\n" + f.LINK[0].textContent || f.LINK[0].href;
+    						//glyph.onClick = f.LINK[0].href.replace(":8080", "");
+    					}
+    				}
+    				
+    				activeSeqs--;
+    				if(activeSeqs == 0)
+    				   draw();
+
+    			}
+    
+             
+             function redraw() {
+    				// changeable options
+    				var roundness = $("#shapeSlider").slider( "option", "value" );
+    				var laneSizes = $("#trackSlider").slider( "option", "value" );
+    				var scaleSize = $("#scaleSlider").slider( "option", "value" );
+    				var canvas = document.getElementById('canvas');
+    				canvas.height = mainChart.getHeight() + 20;
+
+    				// set new values
+    				mainChart.glyph.roundness = roundness;
+    				mainChart.laneSizes = parseInt(laneSizes);
+    				mainChart.scale.font.size = scaleSize;
+    				
+    				if(!$('#scaleShow').attr('checked'))
+    				   mainChart.scale.off = true;
+    				else
+                  mainChart.scale.off = false;
+    				// assemble color
+    				top_color = $('#color1').val();
+    				bottom_color = $('#color2').val();	
+
+    				mainChart.gene.linearGradient = [top_color, bottom_color];
+
+    				mainChart.redraw();
+
+    				// Create image of mainChart1
+               var img = mainChart.canvas.toDataURL("image/png");
+               // Add link to download image
+               $("#export-image").attr('href', img);
+    			}
+
+             function getCanvasWidth(){return($(window).width() * .60);}
+             function getChartWidth(){return ($(window).width() * .60 - 40); }
+             
+             function jump() {
+                var jumpTo = parseInt($('#jump').val());
+                var range = parseInt($('#slider-range').slider('values',1) - $('#slider-range').slider('values',0));
+                var min = jumpTo - range/2;
+                var max = jumpTo + range/2;
+                slideMin = min - bufferSize;
+                slideMax = max + bufferSize;
+                $( "#slider-range" ).slider('option', 'max', slideMax);
+                $( "#slider-range" ).slider('option', 'min', slideMin);
+                redraw(min, max, true);
+             }
+             
+             function getUrlQuerys(){
+                // get the current URL
+                 var url = window.location.toString();
+                 url = url.replace('#', '');
+                 //get the parameters
+                 url.match(/\?(.+)$/);
+                 var params = RegExp.$1;
+                 // split up the query string and store in an
+                 // associative array
+                 var params = params.split("&");
+                 var queryStringList = {};
+
+                 for(var i=0;i<params.length;i++) {
+                     var tmp = params[i].split("=");
+                     queryStringList[tmp[0]] = unescape(tmp[1]);
+                 }
+                 return (queryStringList);
+             }
+             
+             function serializeToIframe() {
+                var iframeStr = '<iframe width="500" height="315" style="border:1px solid rgb(220,220,220); border-radius: 4px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="';
+                iframeStr += serializeToUrl();
+                iframeStr += '&embed=true"'
+                iframeStr += '></iframe>';
+                iframeStr += '<br/><small>Powered by <a href="http://chmille4.github.com/Scribl" style="color:#0000FF;text-align:left">Scribl</a></small>';
+                return iframeStr;
+             }
+             
+             function serializeToUrl() {
+                var checkboxes = $('#source-list').find('input');
+                                
+                // get urls
+                var sourceUrls = [];
+                checkboxes.each( function(index, value){sourceUrls.push(value.value)});
+                
+                // get names
+                var sourceNames = [];
+                checkboxes.each( function(index, value){sourceNames.push(value.id.replace(/-input$/,''))});
+                
+                // get types
+                var types = []
+                checkboxes.each( function(index,value){ types.push( checkboxes[index].getAttribute('data-type') ); } );
+                
+                var trackOptions = [];
+                for(var i=0; i< sourceNames.length; i++){
+                   var expandOption = sourceNames[i] + '-expand-option';
+                   
+                   // check if source is being displayed
+                   var menu = document.getElementById(expandOption);
+                   if (menu)
+                     trackOptions.push(menu.children[0].innerHTML)
+                  else
+                     trackOptions.push('none');
+                }                
+                
+                // get min, max, chromosome
+                var min = $('#slider-range').slider('values',0);
+                var max = $('#slider-range').slider('values',1);
+                var chr = $('#chromosome').val();
+                
+                // construct query string
+                var queryStr = "?"
+                queryStr += "urls=" + sourceUrls.join(',');
+                queryStr += "&names=" + sourceNames.join(',');
+                queryStr += "&min=" + min;
+                queryStr += "&max=" + max;
+                queryStr += "&display=" + trackOptions.join(',');
+                queryStr += "&segment=" + chr;
+                queryStr += "&types=" + types.join(',');
+                
+                return (getBaseURL() + queryStr);                               
+             }
+             
+             function getBaseURL() {
+                 var url = location.href;  // entire url including querystring - also: window.location.href;
+                 var baseURL = url.split('?')[0]
+                 return baseURL;
+             }
+             
+             
+             function loadUrlQuery() {
+                //parse url querys (if any)
+                var querys = getUrlQuerys();                                
+                
+                if (querys != "" && Object.keys(querys).length > 0 && Object.keys(querys)[0] != "" ) {
+                                      
+                   // parse query
+                   var urls = querys['urls'].split(',');
+                   var names = querys['names'].split(',');
+                   var types = querys['types'].split(',');
+                   var displays = querys['display'].split(',');
+                   var chr = querys['segment'];
+                   var min = parseInt(querys['min']);
+                   var max = parseInt(querys['max'])
+                   
+                   // get Das sources                   
+                   for (var k=0; k < names.length; k++) {
+                      if (displays[k] == 'Expand' || displays[k] == 'Collapse'){
+                         activeSeqs++;                     
+                         getDas(names[k], urls[k], chr, types[k], min, max, displays[k]);
+                      }
+                   }
+
+               }
+             }
+
+    		</script>
+
+</head> 
+     
+<body> 
+     
+    <div id="content"> 
+       
+       <div id="title">Figure Maker 1.0</div>
+       <div id='main'>
+          
+          <div id='canvasHolder' style="float:left; width: 82%">
+                <div id="canvasList">
+                   <canvas id='canvas'></canvas>
+                </div>               
+          </div>
+          
+          <div style="float:right; width: 17%">
+             <div style="float: left ">
+                   <div id="sliderControls" class="side-control">
+                     <span class="title">Features</span><br/>
+                     <span class="field">Shape</span><br/>
+                     <div id="shapeSlider" class="slider"></div>
+                     <br/><span class="field">Size</span><br/>
+                     <div id="trackSlider" class ="slider"></div>
+                  </div>
+
+                  <div id="colors" class="side-control">
+                     <span class="title">Colors</span><br/>
+                     <span class="field">1</span><br/>
+                     <input id="color1" type="color" value="rgb(155,193,255)"/><br/>
+                     <span class="field">2</span><br/>
+                     <input id="color2" type="color" value="rgb(63,128,205)" />
+                  </div>
+                  <div id="scaleControls" class="side-control">
+                     <span class="title">Scale</span><br/>
+                     <span class="field">Size</span><br/>
+                     <div id="scaleSlider" class="slider"></div>
+                     <br/><br/><span class="field">Show</span> <input id="scaleShow" type="checkbox" checked="true"/><br/>
+                  </div>
+                  <div id="export" class="side-control">
+                     <span class="title">Export As</span><br/>
+                     <span class="field"><button>Link</button>   <a id='export-image'><button>Image</button></a></span>                 
+                  </div>
+             </div>
+          </div>
+  
+       
+    </div> 
+    
+    <div id="footer">
+      <div style="width=30%;margin-left:auto; margin-right:auto; margin-top: 10px">
+         Powered By <a href="http://chmille4.github.com/Scribl/">Scibl</a>
+      </div>
+      <div style="float:right; margin-right:20px; margin-top:-6px">&copy; <a href="http://github.com/chmille4">Chase Miller</a> 2011</div>
+    </div> 
+
+</body> 
+
+</html>

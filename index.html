@@ -26,7 +26,7 @@
 
     		   $(document).ready(function() {
                var canvas = document.getElementById('canvas');               
-               canvas.width = getCanvasWidth();
+               canvas.width = getCanvasWidth();               
 
                document.getElementById('canvasList').width = getCanvasWidth()+15;               
               // alert(canvas.width);
@@ -34,9 +34,13 @@
                mainChart.glyph.onClick = function(feature) {selectFeature(feature); redraw();};
                mainChart.lanesSizes = 13;
                $("button").button(); 
+
                $("#scaleSlider").slider( { min: 3, max: 30, value: 15, slide: function(event, ui){ redraw('scaleSize') } });
+               $("#scaleSlider").slider('disable');
           		$("#shapeSlider").slider( { min: 1, max: 20, value: 6, slide: function(event, ui){ redraw('featureShape') } });
+          		$("#shapeSlider").slider('disable');
           		$("#trackSlider").slider( { min: 1, max: 200, value: 13, slide: function(event, ui){ redraw('laneSize') } });
+          		$("#trackSlider").slider('disable');
                $('#color1').bind('colorpicked', function () { redraw('color1'); });
                $('#color2').bind('colorpicked', function () { redraw('color2'); });
                $('#scaleShow').bind('click', function () { redraw(); });
@@ -281,6 +285,14 @@
                 return (getBaseURL() + queryStr);                               
              }
              
+             function enableControls() {
+                $('button').each( function(index, button){ $(button).button('option','disabled', false) });
+                $('input').each( function(index, input){ input.disabled = false});
+                $("#scaleSlider").slider('enable');
+                $("#shapeSlider").slider('enable');               
+                $("#trackSlider").slider('enable');
+             }
+             
              function selectAllFeatures() {
                 delete selected;
                 selected = [];
@@ -309,10 +321,11 @@
              
              function loadUrlQuery() {
                 //parse url querys (if any)
-                var querys = getUrlQuerys();                                
+                var querys = getUrlQuerys();                                                
                 
                 if (querys != "" && Object.keys(querys).length > 0 && Object.keys(querys)[0] != "" ) {
-                                      
+                   enableControls();                    
+                  
                    // parse query
                    var urls = querys['urls'].split(',');
                    var names = querys['names'].split(',');
@@ -342,8 +355,7 @@
           		} else {
           		  // Page Layout
 
-          		  dropbox.innerHTML =
-          		    '<p>Drag a Genbank(.gb) or BED(.bed) file onto this area <input type="hidden" id="file" /></p>';
+          		  dropbox.innerHTML ="<p>Drag a Genbank(.gb) or BED(.bed) file onto this area <input type='hidden' id='file' /><br/>or<br/>Import data from <a href='http://chmille4.github.com/Rover/rover.html'>Rover</a></p>";
 
           		  // Displays gene charts.
           		  function displayChart(file) {
@@ -352,11 +364,13 @@
 
           		   reader.onload = function(event) {
           		      mainChart.laneSizes = 13;
-          				if (fileType == "bed") 
+          				if (fileType == "bed") {
           					mainChart.loadBed(event.target.result);
-          				else if (fileType == "gb")
+          					enableControls();
+          				} else if (fileType == "gb") {
           					mainChart.loadGenbank(event.target.result);
-          				else
+          					enableControls();
+          				} else
           				 	alert("File must have a .gb or .bed extension");
           				dropbox.style.display = 'none';
           				mainChart.draw();		
@@ -409,11 +423,11 @@
              <div id="annotationControls" class="side-control">
                 <div class="title">Annotation Options</div>
                 <div id="commands"> 
-                    <div class='field'><button id="add-text">Add text</button></div> 
-                    <div class='field'><button id="remove-selected">Remove</button></div> 
+                    <div class='field'><button disabled='true' id="add-text">Add text</button></div> 
+                    <div class='field'><button disabled='true' id="remove-selected">Remove</button></div> 
                 </div>
                 <div class="field">Annotation Text</div>
-                <textarea  placeholder='type here' id="text"></textarea>
+                <textarea disabled='true' placeholder='type here' id="text"></textarea>
                 
                 
              </div>
@@ -423,7 +437,7 @@
           <div id="right-controls">
                 <div id="scaleControls" class="side-control">
                    <div class="title">Chart Options</div>
-                   <div><div class="field">Show Scale</div> <input id="scaleShow" type="checkbox" checked="true"/></div>
+                   <div><div class="field">Show Scale</div> <input disabled='true' id="scaleShow" type="checkbox" checked="true"/></div>
                    <span class="field">Scale Size</span>
                    <span id="scaleSlider" class="slider"></span>
 
@@ -433,7 +447,7 @@
                 
                 <div id="sliderControls" class="side-control">
                   <div class="title">Feature Options</div>
-                  <div><div class="field">Select All</div> <input id="selectAll" type="checkbox"/></div>
+                  <div><div class="field">Select All</div> <input disabled='true' id="selectAll" type="checkbox"/></div>
                   <span class="field">Shape</span>
                   <div id="shapeSlider" class="slider"></div>
                   <div><span class="field">Color 1</span>
@@ -444,7 +458,7 @@
 
                <div id="export" class="side-control">
                   <span class="title">Export As</span><br/>
-                  <span class="field"><button onClick="exportImage()">Image</button></span>                 
+                  <span class="field"><button id='image-export' disabled='true' onClick="exportImage()">Image</button></span>                 
                </div>
           </div>
   

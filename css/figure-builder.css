@@ -17,6 +17,10 @@ textarea {
    resize: none;
    overflow: auto;
 }
+
+button {
+   cursor: pointer;
+}
         
 #content 
 { 
@@ -173,7 +177,13 @@ textarea {
 }
 
 #dropbox p{
-   margin-top: 190px;
+   margin-top: 140px;
+   font: bold 18px Arial;
+   color: rgb(80,80,80);
+}
+
+#dropbox p a{
+   color: rgb(106,138,179);
 }
 
 

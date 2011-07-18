@@ -421,32 +421,32 @@ fabricCanvas = canvas;
     };
   }
   
-  if (supportsSlider) {
-    (function(){
-      var container = document.getElementById('text-control-buttons');
-      var slider = document.createElement('input');
-      var label = document.createElement('label');
-      label.innerHTML = 'Line height: ';
-      slider.type = 'range';
-      slider.min = -2;
-      slider.max = 10;
-      slider.step = 0.1;
-      slider.value = 1.5;
-      container.appendChild(label);
-      label.appendChild(slider);
-      slider.title = "Line height";
-      slider.onchange = function(){
-        var activeObject = canvas.getActiveObject();
-        if (activeObject && activeObject.type === 'text') {
-          activeObject.lineHeight = this.value;
-          canvas.renderAll();
-        }
-      };
-      
-      canvas.observe('object:selected', function(e) {
-        slider.value = e.memo.target.lineHeight;
-      });
-    })();
-  }
+//   if (supportsSlider) {
+//     (function(){
+//       var container = document.getElementById('text-control-buttons');
+//       var slider = document.createElement('input');
+//       var label = document.createElement('label');
+//       label.innerHTML = 'Line height: ';
+//       slider.type = 'range';
+//       slider.min = -2;
+//       slider.max = 10;
+//       slider.step = 0.1;
+//       slider.value = 1.5;
+// //      container.appendChild(label);
+//   //    label.appendChild(slider);
+//       slider.title = "Line height";
+//       slider.onchange = function(){
+//         var activeObject = canvas.getActiveObject();
+//         if (activeObject && activeObject.type === 'text') {
+//           activeObject.lineHeight = this.value;
+//           canvas.renderAll();
+//         }
+//       };
+//       
+//       canvas.observe('object:selected', function(e) {
+//         slider.value = e.memo.target.lineHeight;
+//       });
+//     })();
+//   }
   
 })(this);

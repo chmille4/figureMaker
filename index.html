@@ -4,8 +4,8 @@
 <head> 
 
     <title></title> 
-    <script src="js/Scribl.min.js"></script>
-      <!-- <script src="../Scribl/src/Scribl.class.js" ></script>
+    <!-- <script src="js/Scribl.min.js"></script> -->
+      <script src="../Scribl/src/Scribl.class.js" ></script>
       <script src="../Scribl/src/Scribl.js" ></script>
       <script src="../Scribl/src/Scribl.track.js" ></script>
       <script src="../Scribl/src/Scribl.lane.js" ></script>
@@ -13,13 +13,15 @@
       <script src="../Scribl/src/Scribl.utils.js" ></script>
       <script src="../Scribl/src/Scribl.svg.js" ></script>
       <script src="../Scribl/src/Scribl.glyph.js" ></script>
+      <script src="../Scribl/src/parsers/genbank.js" ></script>
+      <script src="../Scribl/src/parsers/bed.js" ></script>
       <script src="../Scribl/src/glyph/Scribl.blockarrow.js" ></script>
       <script src="../Scribl/src/glyph/Scribl.arrow.js" ></script>
       <script src="../Scribl/src/glyph/Scribl.rect.js" ></script>
       <script src="../Scribl/src/glyph/Scribl.line.js" ></script>
-      <script src="../Scribl/src/glyph/Scribl.complex.js" ></script> -->
+      <script src="../Scribl/src/glyph/Scribl.complex.js" ></script>
 		
-   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+   <script src="js/jquery.min.js"></script>
    <script src="js/mColorPicker_min.js"></script>
    <!-- <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/> -->
    <link href='http://fonts.googleapis.com/css?family=Amaranth:bold' rel='stylesheet' type='text/css'>
@@ -29,30 +31,57 @@
    
    <script src="js/jquery-ui.chase.min.js"></script>
    <script src="js/jsdas.0.1.6.min.js" ></script>
-   
+   <script src="js/fabric.js"></script> 
+   <script src="js/Delicious_500.font.js"></script>   
     
     <script type="text/javascript">    
             var activeSeqs = 0;
-    		   var mainChart;	   
+    		   var mainChart;	  
+    		   var selected = []; 
+    		   var fabricCanvas;
 
     		   $(document).ready(function() {
-               
-               var canvas = document.getElementById('canvas');
+               var canvas = document.getElementById('canvas');               
                canvas.width = getCanvasWidth();
+
                document.getElementById('canvasList').width = getCanvasWidth()+15;               
               // alert(canvas.width);
                mainChart = new Scribl(canvas, getChartWidth());
+               mainChart.glyph.onClick = function(feature) {selectFeature(feature); redraw();};
                mainChart.lanesSizes = 13;
                $("button").button(); 
-               $("#scaleSlider").slider( { min: 3, max: 30, value: 15, slide: function(event, ui){ redraw() } });
-          		$("#shapeSlider").slider( { min: 1, max: 20, value: 6, slide: function(event, ui){ redraw() } });
-          		$("#trackSlider").slider( { min: 1, max: 200, value: 13, slide: function(event, ui){ redraw() } });
-               $('#color1').bind('colorpicked', function () { redraw(); });
-               $('#color2').bind('colorpicked', function () { redraw(); });
+               $("#scaleSlider").slider( { min: 3, max: 30, value: 15, slide: function(event, ui){ redraw('scaleSize') } });
+          		$("#shapeSlider").slider( { min: 1, max: 20, value: 6, slide: function(event, ui){ redraw('featureShape') } });
+          		$("#trackSlider").slider( { min: 1, max: 200, value: 13, slide: function(event, ui){ redraw('laneSize') } });
+               $('#color1').bind('colorpicked', function () { redraw('color1'); });
+               $('#color2').bind('colorpicked', function () { redraw('color2'); });
                $('#scaleShow').bind('click', function () { redraw(); });
+               $('#selectAll').bind('click', function () { selectAllFeatures(); redraw(); });
+               $('#scriblAnnotation').bind('click', function (e) { 
+                  var event = jQuery.Event("click");
+                  event.clientX = e.clientX;
+                  event.clientY = e.clientY;
+                  $('#canvas').trigger(event) 
+               });
                loadUrlQuery();            
     		   });
 
+            function selectFeature(feature, selecting) {
+               var index = $.inArray(feature, selected)
+               
+               // select if not already selected
+               if ( (selecting == undefined && index == -1) || selecting ) {
+                  // set options to selected
+                  if (selected.length == 0){
+                     $("#shapeSlider").slider('value', feature.getRoundness());
+                  }
+                  selected.push(feature)
+                  feature.borderColor = 'red';
+               } else { // deselect if already selected
+                  selected.splice(index, 1);
+                  feature.borderColor = 'none';
+               }
+            }
 
             function draw() {
                mainChart.canvas.width = getCanvasWidth();
@@ -62,8 +91,8 @@
                mainChart.draw();
                var img = mainChart.canvas.toDataURL("image/png");
                // Add link to download image
-               $("#export-image").attr('href', img);
-               $("#export-image").attr('target', '_blank');
+               // $("#export-image").attr('href', img);
+               // $("#export-image").attr('target', '_blank');
             }
        		function getDas(name, source, chromosome, type, min, max, display) {
     
@@ -74,7 +103,27 @@
        				else
        				   JSDAS.features(url, function(response) { addFeatures(response, "Collapse") });
 
-             }           
+            }  
+             
+            function exportImage() {
+               var canvas = document.createElement('canvas'); 
+               var ctx = canvas.getContext("2d");
+               
+               var chartCanvas = document.getElementById('canvas');
+               var annotationCanvas = document.getElementById('scriblAnnotation');
+               canvas.width =annotationCanvas.width;
+               if (chartCanvas.height > annotationCanvas.height)
+                  canvas.height =chartCanvas.height; 
+               else 
+                  canvas.height =annotationCanvas.height; 
+               
+               
+                ctx.drawImage(chartCanvas, 0,0);
+                fabricCanvas.renderAll(true);
+                ctx.drawImage(fabricCanvas.upperCanvasEl, 0,0);
+               var img = canvas.toDataURL('png');
+               window.open(img);
+            }
 
     		   function addFeatures(response, display) {
     		      // set width again in case window wasn't loaded completely
@@ -90,7 +139,7 @@
                    // TODO add an error fetching message
                    return; 
                 }
-                // features.sort( function(a,b){ return(b.position - a.position); });
+               features.sort( function(a,b){ return(parseInt(a.START.textContent) - parseInt(b.START.textContent)); });
     				for (var i=0; i < features.length; i++) {
     					var f = features[i];
     					var start = parseInt(f.START.textContent);
@@ -100,7 +149,7 @@
     						var glyph = track.addGene(start, length, orientation);
     					} else
     						var glyph = track.addFeature( new Rect( "rect", start, length) );
-
+                     
     					if (f.TYPE.textContent) glyph.name = f.TYPE.textContent;
     					if(f.LINK && f.LINK[0] && f.LINK[0].href) { 
     						//glyph.onMouseover = f.TYPE.textContent + "\n" + f.LINK[0].textContent || f.LINK[0].href;
@@ -115,52 +164,65 @@
     			}
     
              
-             function redraw() {
-    				// changeable options
+             function redraw(option) {
+    				// changeable options    				
     				var roundness = $("#shapeSlider").slider( "option", "value" );
     				var laneSizes = $("#trackSlider").slider( "option", "value" );
     				var scaleSize = $("#scaleSlider").slider( "option", "value" );
     				var canvas = document.getElementById('canvas');
     				canvas.height = mainChart.getHeight() + 20;
-
-    				// set new values
-    				mainChart.glyph.roundness = roundness;
-    				mainChart.laneSizes = parseInt(laneSizes);
-    				mainChart.scale.font.size = scaleSize;
     				
-    				if(!$('#scaleShow').attr('checked'))
+               if(!$('#scaleShow').attr('checked'))
     				   mainChart.scale.off = true;
     				else
-                  mainChart.scale.off = false;
-    				// assemble color
-    				top_color = $('#color1').val();
-    				bottom_color = $('#color2').val();	
+                  mainChart.scale.off = false;    				
 
-    				mainChart.gene.linearGradient = [top_color, bottom_color];
+            	// assemble color
+    				top_color = $('#color1').val();
+    				bottom_color = $('#color2').val();
+               
+               //  set new chart values
+               mainChart.laneSizes = parseInt(laneSizes);
+               mainChart.scale.font.size = scaleSize;
+               
+               // apply changed to selected features if any
+               // if (selected.length > 0) {
+               //    var l = 1;
+                  $.each(selected, function(index, feature) { if (option == 'featureShape') feature.roundness = roundness;});
+                  $.each(selected, function(index, feature) { 
+                     if (option == 'color1' || option == 'color2')
+                        feature.setColorGradient(top_color, bottom_color);
+                  });
+                  //                }
+                  //                else { // apply to all features if none selected
+                  // // set glyph values
+                  // mainChart.glyph.roundness = roundness;
+                  //                   mainChart.gene.linearGradient = [top_color, bottom_color];
+                  //                }
 
     				mainChart.redraw();
 
     				// Create image of mainChart1
                var img = mainChart.canvas.toDataURL("image/png");
                // Add link to download image
-               $("#export-image").attr('href', img);
-               $("#export-image").attr('target', '_blank');
+               // $("#export-image").attr('href', img);
+               // $("#export-image").attr('target', '_blank');
     			}
 
              function getCanvasWidth(){return($(window).width() * .60);}
-             function getChartWidth(){return ($(window).width() * .60 - 40); }
+             function getChartWidth(){return ($(window).width() * .60 - 46); }
              
-             function jump() {
-                var jumpTo = parseInt($('#jump').val());
-                var range = parseInt($('#slider-range').slider('values',1) - $('#slider-range').slider('values',0));
-                var min = jumpTo - range/2;
-                var max = jumpTo + range/2;
-                slideMin = min - bufferSize;
-                slideMax = max + bufferSize;
-                $( "#slider-range" ).slider('option', 'max', slideMax);
-                $( "#slider-range" ).slider('option', 'min', slideMin);
-                redraw(min, max, true);
-             }
+             // function jump() {
+             //    var jumpTo = parseInt($('#jump').val());
+             //    var range = parseInt($('#slider-range').slider('values',1) - $('#slider-range').slider('values',0));
+             //    var min = jumpTo - range/2;
+             //    var max = jumpTo + range/2;
+             //    slideMin = min - bufferSize;
+             //    slideMax = max + bufferSize;
+             //    $( "#slider-range" ).slider('option', 'max', slideMax);
+             //    $( "#slider-range" ).slider('option', 'min', slideMin);
+             //    redraw(min, max, true);
+             // }             
              
              function getUrlQuerys(){
                 // get the current URL
@@ -233,6 +295,25 @@
                 queryStr += "&types=" + types.join(',');
                 
                 return (getBaseURL() + queryStr);                               
+             }
+             
+             function selectAllFeatures() {
+                delete selected;
+                selected = [];
+                
+                var selecting;
+                
+                if( document.getElementById('selectAll').checked )
+                  selecting = true;
+                else
+                  selecting = false;
+                  
+                for (var i=0; i < mainChart.tracks.length; i++) {
+                   for (var k=0; k< mainChart.tracks[i].lanes.length; k++) {
+                      for (var j=0; j < mainChart.tracks[i].lanes[k].features.length; j++)
+                         selectFeature( mainChart.tracks[i].lanes[k].features[j], selecting);
+                   }
+                }
              }
              
              function getBaseURL() {
@@ -340,43 +421,58 @@
        <div id="title">Figure Maker 1.0</div>
        <div id='main'>
           
-          <div id='canvasHolder' style="float:left; width: 82%">
-                <div id="canvasList">
-                   <canvas id='canvas'></canvas>
+          <div id="left-controls">
+             <div id="annotationControls" class="side-control">
+                <div class="title">Annotation Options</div>
+                <div id="commands"> 
+                    <div class='field'><button id="add-text">Add text</button></div> 
+                    <div class='field'><button id="remove-selected">Remove</button></div> 
+                </div>
+                <div class="field">Annotation Text</div>
+                <textarea  placeholder='type here' id="text"></textarea>
+                
+                
+             </div>
+             
+          </div>         
+          
+          <div id="right-controls">
+                <div id="scaleControls" class="side-control">
+                   <div class="title">Chart Options</div>
+                   <div><div class="field">Show Scale</div> <input id="scaleShow" type="checkbox" checked="true"/></div>
+                   <span class="field">Scale Size</span>
+                   <span id="scaleSlider" class="slider"></span>
+
+                   <span class="field">Lane Size</span>
+                   <div id="trackSlider" class ="slider"></div>
+                </div>
+                
+                <div id="sliderControls" class="side-control">
+                  <div class="title">Feature Options</div>
+                  <div><div class="field">Select All</div> <input id="selectAll" type="checkbox"/></div>
+                  <span class="field">Shape</span>
+                  <div id="shapeSlider" class="slider"></div>
+                  <div><span class="field">Color 1</span>
+                  <input id="color1" type="color" value="rgb(155,193,255)"/></div>
+                  <span class="field">Color 2</span>
+                  <input id="color2" type="color" value="rgb(63,128,205)" />
+               </div>
+
+               <div id="export" class="side-control">
+                  <span class="title">Export As</span><br/>
+                  <span class="field"><button onClick="exportImage()">Image</button></span>                 
+               </div>
+          </div>
+  
+          <div id='canvasHolder'>
+                <div id="canvasList">                   
+                   <canvas style="left: 7.5px;" class='canvas' id='canvas'></canvas>
+                   <canvas style="left: 7.5px; margin-left: 7.5px" height='410' class='canvas' id='scriblAnnotation'></canvas>                                      
+
                    <div id='dropbox'></div>
                 </div>               
           </div>
-          
-          <div style="float:right; width: 17%">
-             <div style="float: left ">
-                   <div id="sliderControls" class="side-control">
-                     <span class="title">Features</span><br/>
-                     <span class="field">Shape</span><br/>
-                     <div id="shapeSlider" class="slider"></div>
-                     <br/><span class="field">Size</span><br/>
-                     <div id="trackSlider" class ="slider"></div>
-                  </div>
-
-                  <div id="colors" class="side-control">
-                     <span class="title">Colors</span><br/>
-                     <span class="field">1</span><br/>
-                     <input id="color1" type="color" value="rgb(155,193,255)"/><br/>
-                     <span class="field">2</span><br/>
-                     <input id="color2" type="color" value="rgb(63,128,205)" />
-                  </div>
-                  <div id="scaleControls" class="side-control">
-                     <span class="title">Scale</span><br/>
-                     <span class="field">Size</span><br/>
-                     <div id="scaleSlider" class="slider"></div>
-                     <br/><br/><span class="field">Show</span> <input id="scaleShow" type="checkbox" checked="true"/><br/>
-                  </div>
-                  <div id="export" class="side-control">
-                     <span class="title">Export As</span><br/>
-                     <span class="field"><button>Link</button>   <a id='export-image'><button>Image</button></a></span>                 
-                  </div>
-             </div>
-          </div>
-  
+       
        
     </div> 
     
@@ -386,7 +482,8 @@
       </div>
       <div style="float:right; margin-right:20px; margin-top:-6px">&copy; <a href="http://github.com/chmille4">Chase Miller</a> 2011</div>
     </div> 
-
+    
+       <script src="js/demo.js" type="text/javascript"></script> 
 </body> 
 
 </html>

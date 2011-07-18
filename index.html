@@ -291,6 +291,7 @@
                 $("#scaleSlider").slider('enable');
                 $("#shapeSlider").slider('enable');               
                 $("#trackSlider").slider('enable');
+                $('#text').attr('disabled', false);
              }
              
              function selectAllFeatures() {
@@ -342,6 +343,8 @@
                          getDas(names[k], urls[k], chr, types[k], min, max, displays[k]);
                       }
                    }
+                   
+                   $('#scriblAnnotation').css('z-index', 4);
 
                } else {
                   initDropbox();
@@ -397,6 +400,7 @@
           		  };
 
           		  dropbox.ondragleave = function() {
+          		    dropbox.style.border = '';
           		    return false;
           		  };
 

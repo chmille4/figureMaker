@@ -4465,12 +4465,12 @@ fabric.util.getElementOffset = getElementOffset;
 
       if (this._shouldClearSelection(e)) {
 
-        // this._groupSelector = {
-        //   ex: pointer.x,
-        //   ey: pointer.y,
-        //   top: 0,
-        //   left: 0
-        // };
+        this._groupSelector = {
+          ex: pointer.x,
+          ey: pointer.y,
+          top: 0,
+          left: 0
+        };
 
         this.deactivateAllWithDispatch();
       }

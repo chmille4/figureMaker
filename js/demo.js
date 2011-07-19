@@ -33,6 +33,18 @@
     }
     */
   });
+  canvas.HOVER_CURSOR = 'text';
+  
+  canvas.observe('object:selected', function() {
+     document.addEventListener("mouseup", selectTextArea, false);
+  });
+  
+  function selectTextArea() {
+     var textArea = document.getElementById('text');     
+     textArea.focus();
+     textArea.select();
+     document.removeEventListener("mouseup", selectTextArea, false);
+  }
   
 fabricCanvas = canvas;
   
@@ -204,11 +216,11 @@ fabricCanvas = canvas;
       activeObjectButtons[i].disabled = false;
     }
     
-    lockHorizontallyEl.innerHTML = (selectedObject.lockMovementX ? 'Unlock horizontal movement' : 'Lock horizontal movement');
-    lockVerticallyEl.innerHTML = (selectedObject.lockMovementY ? 'Unlock vertical movement' : 'Lock vertical movement');
-    lockScalingXEl.innerHTML = (selectedObject.lockScalingX ? 'Unlock horizontal scaling' : 'Lock horizontal scaling');
-    lockScalingYEl.innerHTML = (selectedObject.lockScalingY ? 'Unlock vertical scaling' : 'Lock vertical scaling');
-    lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
+    // lockHorizontallyEl.innerHTML = (selectedObject.lockMovementX ? 'Unlock horizontal movement' : 'Lock horizontal movement');
+    // lockVerticallyEl.innerHTML = (selectedObject.lockMovementY ? 'Unlock vertical movement' : 'Lock vertical movement');
+    // lockScalingXEl.innerHTML = (selectedObject.lockScalingX ? 'Unlock horizontal scaling' : 'Lock horizontal scaling');
+    // lockScalingYEl.innerHTML = (selectedObject.lockScalingY ? 'Unlock vertical scaling' : 'Lock vertical scaling');
+    // lockRotationEl.innerHTML = (selectedObject.lockRotation ? 'Unlock rotation' : 'Lock rotation');
   }
   
   canvas.observe('selection:cleared', function(e) {
@@ -251,11 +263,11 @@ fabricCanvas = canvas;
   //  canvas.freeDrawingLineWidth = parseInt(drawingLineWidthEl.value, 10) || 1;
   //  
   
-  var text = 'select this box and type in the text area to the left';
+  var text = 'select this box and start typing';
   
   document.getElementById('add-text').onclick = function() {
     var textSample = new fabric.Text(text, { 
-      left: 200, 
+      left: 400, 
       top: 200,
       fontfamily: 'delicious_500',
       angle: 0,

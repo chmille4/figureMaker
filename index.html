@@ -396,30 +396,24 @@
        <div id='main'>
           
           <div id="left-controls">
-             <div id="annotationControls" class="side-control">
-                <div class="title">Annotation Options</div>
-                <div id="commands"> 
-                    <div class='field'><button disabled='true' id="add-text">Add text</button></div> 
-                    <div class='field'><button disabled='true' id="remove-selected">Remove</button></div> 
-                </div>
-                <div class="field">Annotation Text</div>
-                <textarea disabled='true' placeholder='type here' id="text"></textarea>
-                
-                
+             <div id="scaleControls" class="side-control">
+                <div class="title">Chart Options</div>
+                <div><div class="field">Show Scale</div> <input disabled='true' id="scaleShow" type="checkbox" checked="true"/></div>
+                <span class="field">Scale Size</span>
+                <span id="scaleSlider" class="slider"></span>
+
+                <span class="field">Lane Size</span>
+                <div id="trackSlider" class ="slider"></div>
+             </div>
+             
+             <div id="export" class="side-control">
+                <span class="title">Export As</span><br/>
+                <span class="field"><button id='image-export' disabled='true' onClick="exportImage()">Image</button></span>                 
              </div>
              
           </div>         
           
           <div id="right-controls">
-                <div id="scaleControls" class="side-control">
-                   <div class="title">Chart Options</div>
-                   <div><div class="field">Show Scale</div> <input disabled='true' id="scaleShow" type="checkbox" checked="true"/></div>
-                   <span class="field">Scale Size</span>
-                   <span id="scaleSlider" class="slider"></span>
-
-                   <span class="field">Lane Size</span>
-                   <div id="trackSlider" class ="slider"></div>
-                </div>
                 
                 <div id="sliderControls" class="side-control">
                   <div class="title">Feature Options</div>
@@ -431,11 +425,17 @@
                   <span class="field">Color 2</span>
                   <input id="color2" type="color" value="rgb(63,128,205)" />
                </div>
-
-               <div id="export" class="side-control">
-                  <span class="title">Export As</span><br/>
-                  <span class="field"><button id='image-export' disabled='true' onClick="exportImage()">Image</button></span>                 
+               
+               
+               <div id="annotationControls" class="side-control">
+                  <div class="title">Annotation Options</div>
+                  <div id="commands"> 
+                      <div class='field'><button disabled='true' id="add-text">Add text</button></div> 
+                      <div class='field'><button disabled='true' id="remove-selected">Remove</button></div> 
+                  </div>
+                  <textarea placeholder='type here' id="text" style="position:absolute; left: -999em; overflow:hidden"></textarea>
                </div>
+               
           </div>
   
           <div id='canvasHolder'>

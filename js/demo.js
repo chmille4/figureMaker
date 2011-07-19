@@ -21,10 +21,11 @@
   // function getRandomNum(min, max) {
   //   return Math.random() * (max - min) + min;
   // }
- 
+  
+
   var annotationLayer = document.getElementById('scriblAnnotation');
-  annotationLayer.width = getCanvasWidth();
-  $(annotationLayer).width(getCanvasWidth());
+  // annotationLayer.width = getCanvasWidth();
+  // $(annotationLayer).width(getCanvasWidth());
   var canvas = global.canvas = new fabric.Canvas('scriblAnnotation', {
 //     var canvas = global.canvas = new fabric.Canvas('canvas', {
     /*
@@ -33,12 +34,20 @@
     }
     */
   });
+  canvas.setWidth(getCanvasWidth());
+  
+  // set fabric canvases offset;
+  var leftPx = document.getElementById('canvas').style.left;
+  canvas.lowerCanvasEl.style.left = leftPx;
+  canvas.upperCanvasEl.style.left = leftPx;
+  
   canvas.HOVER_CURSOR = 'text';
   
   canvas.observe('object:selected', function() {
      document.addEventListener("mouseup", selectTextArea, false);
   });
-  
+
+
   function selectTextArea() {
      var textArea = document.getElementById('text');     
      textArea.focus();

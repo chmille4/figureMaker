@@ -27,7 +27,6 @@
     		   $(document).ready(function() {
                var canvas = document.getElementById('canvas');               
                canvas.width = getCanvasWidth();               
-
                document.getElementById('canvasList').width = getCanvasWidth()+20;               
               // alert(canvas.width);
                mainChart = new Scribl(canvas, getChartWidth());
@@ -53,6 +52,7 @@
                });
                loadUrlQuery();            
     		   });
+
 
             function selectFeature(feature, selecting) {
                var index = $.inArray(feature, selected)
@@ -440,9 +440,8 @@
   
           <div id='canvasHolder'>
                 <div id="canvasList">                   
-                   <canvas class='canvas' id='canvas'></canvas>
-                   <canvas style="margin-left: 10px" height='410' class='canvas' id='scriblAnnotation'></canvas>                                      
-
+                   <canvas style="left: 10px" class='canvas' id='canvas'></canvas>
+                   <canvas style="left: 10px" height='410' class='canvas' id='scriblAnnotation'></canvas>                                      
                    <div id='dropbox'></div>
                 </div>               
           </div>

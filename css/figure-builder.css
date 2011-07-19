@@ -154,7 +154,7 @@ button {
 .canvas {
    position: absolute;
    top: 0px;
-   left: 10px;
+/*   left: 10px;  embedded b\c of issues with fabricjs */
 }
 
 

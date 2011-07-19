@@ -4459,18 +4459,18 @@ fabric.util.getElementOffset = getElementOffset;
       if (this._currentTransform) return;
 
       var target = this.findTarget(e),
-          pointer = this.getPointer(e),
+          pointer = this.getPointer(e),          
           activeGroup = this.getActiveGroup(),
           corner;
 
       if (this._shouldClearSelection(e)) {
 
-        this._groupSelector = {
-          ex: pointer.x,
-          ey: pointer.y,
-          top: 0,
-          left: 0
-        };
+        // this._groupSelector = {
+        //   ex: pointer.x,
+        //   ey: pointer.y,
+        //   top: 0,
+        //   left: 0
+        // };
 
         this.deactivateAllWithDispatch();
       }
@@ -5250,7 +5250,7 @@ fabric.util.getElementOffset = getElementOffset;
       var pointer = getPointer(e);
       return {
         x: pointer.x - this._offset.left,
-        y: pointer.y - this._offset.top
+        y: pointer.y - this._offset.top + document.getElementById('canvasList').scrollTop
       };
     },
 
@@ -7019,7 +7019,7 @@ fabric.util.object.extend(fabric.Canvas.prototype, {
     _findTargetCorner: function(e, offset) {
       var pointer = getPointer(e),
           ex = pointer.x - offset.left,
-          ey = pointer.y - offset.top,
+          ey = pointer.y - offset.top  + document.getElementById('canvasList').scrollTop,
           xpoints,
           lines;
 

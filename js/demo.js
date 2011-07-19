@@ -24,7 +24,7 @@
  
   var annotationLayer = document.getElementById('scriblAnnotation');
   annotationLayer.width = getCanvasWidth();
-  $(annotationLayer).width(getCanvasWidth());               
+  $(annotationLayer).width(getCanvasWidth());
   var canvas = global.canvas = new fabric.Canvas('scriblAnnotation', {
 //     var canvas = global.canvas = new fabric.Canvas('canvas', {
     /*

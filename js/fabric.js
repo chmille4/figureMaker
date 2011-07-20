@@ -4920,7 +4920,8 @@ fabric.util.getElementOffset = getElementOffset;
           currentObject,
           selectionX1Y1 = new fabric.Point(min(x1, x2), min(y1, y2)),
           selectionX2Y2 = new fabric.Point(max(x1, x2), max(y1, y2));
-
+          
+      selectScriblObjects(selectionX1Y1.x, selectionX1Y1.y, selectionX2Y2.x, selectionX2Y2.y);
       for (var i = 0, len = this._objects.length; i < len; ++i) {
         currentObject = this._objects[i];
 

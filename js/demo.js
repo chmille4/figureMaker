@@ -284,7 +284,7 @@ fabricCanvas = canvas;
       scaleX: 0.5,
       scaleY: 0.5
     });
-    textSample.lockRotation = true;
+//    textSample.lockRotation = true;
     canvas.add(textSample);
     // updateComplexity();
   };

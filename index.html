@@ -397,11 +397,15 @@
           		}
              }
 
+             function testIE() {
+                if (navigator.appName == 'Microsoft Internet Explorer')
+                  alert("Rover takes advantage of the latest features on the web and therefore doesn't work with Internet Explorer. Please use Chrome, Safari, or Firefox");
+             }
     		</script>
 
 </head> 
      
-<body> 
+<body onLoad='testIE()'> 
      
     <div id="content"> 
        
@@ -421,7 +425,7 @@
              
              <div id="export" class="side-control">
                 <span class="title">Export As</span><br/>
-                <span class="field"><button id='image-export' disabled='true' onClick="exportImage()">Image</button></span>                 
+                <div class="field"><button id='image-export' disabled='true' onClick="exportImage()">Image</button></div>                 
              </div>
              
           </div>         
@@ -443,7 +447,7 @@
                <div id="annotationControls" class="side-control">
                   <div class="title">Annotation Options</div>
                   <div id="commands"> 
-                      <div class='field'><button disabled='true' id="add-text">Add text</button></div> 
+                      <div class='field'><button disabled='true' id="add-text">Add text</button></div>
                       <div class='field'><button disabled='true' id="remove-selected">Remove</button></div> 
                   </div>
                   <textarea placeholder='type here' id="text" style="position:absolute; left: -999em; overflow:hidden"></textarea>

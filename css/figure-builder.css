@@ -45,6 +45,24 @@ button {
     text-align: center;
 }
 
+#spinner-div {
+   display: 'none';
+   margin-top: -350px;
+   width: 80%;   
+   margin-left: auto;
+   margin-right: auto;
+   font: bold 18px Arial;
+   color: rgb(80,80,80);
+}
+
+#spinner {
+   width: 64px;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 10px
+}
+
+
 /*       side      */
 
 #left-controls {
@@ -176,6 +194,7 @@ button {
    height: 98%;
    width: 99%;
 }
+
 
 #dropbox p{
    margin-top: 140px;

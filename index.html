@@ -85,6 +85,9 @@
             }
 
             function draw() {
+               // turn loading spinner off
+               $('#spinner-div').css('display', 'none');
+               
                mainChart.canvas.width = getCanvasWidth();
                mainChart.laneSizes = 13;
                mainChart.canvas.height = mainChart.getHeight();
@@ -309,6 +312,10 @@
                 var querys = getUrlQuerys();                                                
                 
                 if (querys != "" && Object.keys(querys).length > 0 && Object.keys(querys)[0] != "" ) {
+                   // turn on loading spinner
+                   $('#spinner-div').css('display', 'inherit');
+                   
+                   // ungray controls
                    enableControls();                    
                   
                    // parse query
@@ -456,9 +463,13 @@
           </div>
   
           <div id='canvasHolder'>
-                <div id="canvasList">                   
-                   <canvas style="left: 10px" class='canvas' id='canvas'></canvas>
+                <div id="canvasList">                                      
+                   <canvas style="left: 10px" class='canvas' id='canvas'></canvas>                   
                    <canvas style="left: 10px" height='410' class='canvas' id='scriblAnnotation'></canvas>                                      
+                   <div id='spinner-div'>
+                      <img id ='spinner' src='images/spinner.gif'></img>                      
+                      <div>Retrieving sequences from remote sources</div>
+                   </div>
                    <div id='dropbox'></div>
                 </div>               
           </div>

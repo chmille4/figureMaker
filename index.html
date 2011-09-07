@@ -100,10 +100,10 @@
     
        				// get DAS data
        				var url = source + '/features?segment=' + chromosome + ':' + min + "," + max + ';type=' + type;   				
-       				if(display == "Expand")
-       				   JSDAS.features(url, function(response) { addFeatures(response, "Expand") });
-       				else
-       				   JSDAS.features(url, function(response) { addFeatures(response, "Collapse") });
+                  // if(display == "Expand")
+                  //    JSDAS.features(url, function(response) { addFeatures(response, "Expand") });
+                  // else
+       				JSDAS.features(url, function(response) { addFeatures(response, display) });
 
             }  
              
@@ -131,10 +131,11 @@
     		      // set width again in case window wasn't loaded completely
                mainChart.width = getChartWidth();
                var track;
-               if (display == 'Expand')
+               // if (display == 'Expand')
                   track = mainChart.addTrack();
-               else
-                  track = mainChart.addTrack().addLane();
+                  track.drawStyle = display;
+               // else
+               //    track = mainChart.addTrack().addLane();
 
     				var features = response.GFF.SEGMENT[0].FEATURE;
                 if (!features) {

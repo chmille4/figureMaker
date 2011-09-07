@@ -329,7 +329,8 @@
                    
                    // get Das sources                   
                    for (var k=0; k < names.length; k++) {
-                      if (displays[k] == 'Expand' || displays[k] == 'Collapse'){
+                      var display = displays[k].toLowerCase();
+                      if (display == 'expand' || display == 'collapse' || display == 'line'){
                          activeSeqs++;                     
                          getDas(names[k], urls[k], chr, types[k], min, max, displays[k]);
                       }

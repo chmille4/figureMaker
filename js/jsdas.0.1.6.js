@@ -125,11 +125,11 @@ var JSDAS = function() {
 				var response;
 				if (JSDAS.error)
 				    response = undefined;
-				else if (charts.hasOwnProperty(view.chart.canvas.id))
+				else
 				    response =(!JSDAS.error)?JSDAS.parseFeatures(xml, version):undefined;
-				else {
-				    return xhr;
-				}
+            // else {
+            //     return xhr;
+            // }
 				if (JSDAS.error) {
 					if(error_callback && typeof(error_callback)=='FUNCTION') error_callback();
 				}
@@ -2453,7 +2453,7 @@ JSDAS.XMLLoader = {
 				if(!data) { //This block is here since we cannot rely on content type headers
 				     errorcallback && errorcallback({id: 'not_xml', msg: "The response was not XML"});
 				}
-				if(data.documentElement.nodeName != 'parsererror') {
+				else if(data.documentElement.nodeName != 'parsererror') {
 					callback(data);
 					return;
 				} 

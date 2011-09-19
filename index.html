@@ -14,7 +14,7 @@
    <link rel="stylesheet" type="text/css" href="css/figure-builder.css" />
    
    <script src="js/jquery-ui.chase.min.js"></script>
-   <script src="js/jsdas.0.1.6.min.js" ></script>
+   <script src="js/jsdas.0.1.6.js" ></script>
    <script src="js/fabric.js"></script> 
    <script src="js/Delicious_500.font.js"></script>   
     
@@ -61,7 +61,7 @@
                if ( (selecting == undefined && index == -1) || selecting ) {
                   // set options to selected
                   if (selected.length == 0){
-                     $("#shapeSlider").slider('value', feature.getRoundness());
+                 //    $("#shapeSlider").slider('value', feature.getRoundness());
                   }
                   selected.push(feature)
                   feature.borderColor = 'rgba(195,38,35,0.6)';

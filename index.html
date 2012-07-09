@@ -6,15 +6,15 @@
    <title></title> 
    <script src="js/Scribl.1.1.2.min.js"></script>         	
    <script src="js/jquery.min.js"></script>
-   <script src="https://raw.github.com/Belelros/jQuery-ColorPicker/master/colorpicker.min.js"></script>
+   <script src="js/jquery-ui.chase.min.js"></script>
+   <script src="js/colorpicker.js"></script>
    <!-- <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/> -->
    <link href='http://fonts.googleapis.com/css?family=Amaranth:bold' rel='stylesheet' type='text/css'>
    <!-- <link href='http://fonts.googleapis.com/css?family=Gruppo' rel='stylesheet' type='text/css'> -->
    <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.13.redmond.css" />
    <link rel="stylesheet" type="text/css" href="css/figure-builder.css" />
-   <link rel="stylesheet" type="text/css" href="https://raw.github.com/Belelros/jQuery-ColorPicker/master/css/colorpicker.min.css" />   
+   <link href="css/colorpicker.css" rel="stylesheet" type="text/css" media="all">
    
-   <script src="js/jquery-ui.chase.min.js"></script>
    <script src="js/jsdas.0.1.6.js" ></script>
    <script src="js/fabric.js"></script> 
    <script src="js/Delicious_500.font.js"></script>   
@@ -44,8 +44,41 @@
           		$("#shapeSlider").slider('disable');
           		$("#trackSlider").slider( { min: 1, max: 200, value: 13, slide: function(event, ui){ redraw('laneSize') } });
           		$("#trackSlider").slider('disable');
-               $('#color1').bind('colorpicked', function () { redraw('color1'); });
-               $('#color2').bind('colorpicked', function () { redraw('color2'); });
+               // $('#color1').bind('colorpicked', function () { redraw('color1'); });
+               // $('#color2').bind('colorpicked', function () { redraw('color2'); });
+               $('#color1').ColorPicker({
+                   onSubmit: function(hsb, hex, rgb, el, parent) {
+                       $(el).val(hex);
+                       $(el).ColorPickerHide();
+                       $(el).css('background-color', '#' + hex);
+                   },
+                   onBeforeShow: function () {
+                       $(this).ColorPickerSetColor(this.value);
+                   },
+                   onChange: function(hsb, hex, rgb){
+                       redraw('color1', '#'+hex);
+                   }
+               })
+               .bind('keyup', function(){
+                   $(this).ColorPickerSetColor(this.value);
+               });
+               $('#color2').ColorPicker({
+                   onSubmit: function(hsb, hex, rgb, el, parent) {
+                       $(el).val(hex);
+                       $(el).ColorPickerHide();
+                       $(el).css('background-color', '#' + hex);
+                   },
+                   onBeforeShow: function () {
+                       $(this).ColorPickerSetColor(this.value);
+                   },
+                   onChange: function(hsb, hex, rgb){
+                       redraw('color1', '#'+hex);
+                   }
+               })
+               .bind('keyup', function(){
+                   $(this).ColorPickerSetColor(this.value);
+               });               
+               
                $('#scaleShow').bind('click', function () { redraw(); });
                $('#selectAll').bind('click', function () { selectAllFeatures(); redraw(); });
                $('#scriblAnnotation').bind('click', function (e) { 
@@ -291,7 +324,7 @@
     			}
     
              
-             function redraw(option) {
+             function redraw(option, hex) {
     				// changeable options    				
     				var roundness = $("#shapeSlider").slider( "option", "value" );
     				var laneSizes = $("#trackSlider").slider( "option", "value" );
@@ -305,8 +338,16 @@
                   mainChart.scale.off = false;    				
 
             	// assemble color
-    				top_color = $('#color1').val();
-    				bottom_color = $('#color2').val();
+            	if(option == 'color1') {
+            	   top_color = hex;
+       				bottom_color = $('#color2').val();       				
+            	} else if (option == 'color2') {
+       				top_color = $('#color1').val();
+       				bottom_color = hex;            	   
+            	} else {
+       				top_color = $('#color1').val();
+       				bottom_color = $('#color2').val();
+       			}
                
                //  set new chart values
                mainChart.laneSizes = parseInt(laneSizes);
@@ -574,9 +615,9 @@
                   <span class="field">Shape</span>
                   <div id="shapeSlider" class="slider"></div>
                   <div><span class="field">Color 1</span>
-                  <input id="color1" type="color" value="rgb(155,193,255)"/></div>
+                  <input id="color1" value="rgb(155,193,255)"/></div>
                   <span class="field">Color 2</span>
-                  <input id="color2" type="color" value="rgb(63,128,205)" />
+                  <input id="color2" value="rgb(63,128,205)" />
                </div>
                
                

@@ -4,7 +4,7 @@
 <head> 
 
    <title></title> 
-   <script src="js/Scribl.1.1.2.min.js"></script>         	
+   <script src="js/Scribl.1.1.2.min.js"></script>           
    <script src="js/jquery.min.js"></script>
    <script src="js/jquery-ui.chase.min.js"></script>
    <script src="js/colorpicker.js"></script>
@@ -34,6 +34,7 @@
                document.getElementById('canvasList').width = getCanvasWidth()+20;               
               // alert(canvas.width);
                mainChart = new Scribl(canvas, getChartWidth());
+               mainChart.scale.auto = false;
                mainChart.glyph.onClick = function(feature) {selectFeature(feature); redraw();};
                mainChart.lanesSizes = 13;
                $("button").button(); 
@@ -358,7 +359,6 @@
                      if (option == 'color1' || option == 'color2')
                         feature.setColorGradient(top_color, bottom_color);
                   });
-
     				mainChart.redraw();
     			}
 

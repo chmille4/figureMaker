@@ -4,7 +4,24 @@
 <head> 
 
    <title></title> 
-   <script src="js/Scribl.1.1.2.min.js"></script>           
+   <script src="js/Scribl.1.1.5.min.js"></script>  
+   <!-- <script src="../Scribl/src/Scribl.class.js" ></script>
+   <script src="../Scribl/src/Scribl.js" ></script>
+   <script src="../Scribl/src/Scribl.track.js" ></script>
+   <script src="../Scribl/src/Scribl.lane.js" ></script>
+   <script src="../Scribl/src/Scribl.tooltips.js" ></script>
+   <script src="../Scribl/src/Scribl.events.js" ></script>
+   <script src="../Scribl/src/Scribl.utils.js" ></script>
+   <script src="../Scribl/src/Scribl.svg.js" ></script>
+   <script src="../Scribl/src/Scribl.glyph.js" ></script>
+   <script src="../Scribl/src/glyph/Scribl.blockarrow.js" ></script>
+   <script src="../Scribl/src/glyph/Scribl.arrow.js" ></script>
+   <script src="../Scribl/src/glyph/Scribl.rect.js" ></script>
+   <script src="../Scribl/src/glyph/Scribl.line.js" ></script>
+   <script src="../Scribl/src/glyph/Scribl.complex.js" ></script>
+   <script src="../Scribl/src/parsers/bed.js" ></script>
+   <script src="../Scribl/src/parsers/genbank.js" ></script> -->
+   <link rel="stylesheet" type="text/css" href="demos.css" />         
    <script src="js/jquery.min.js"></script>
    <script src="js/jquery-ui.chase.min.js"></script>
    <script src="js/colorpicker.js"></script>
@@ -73,7 +90,7 @@
                        $(this).ColorPickerSetColor(this.value);
                    },
                    onChange: function(hsb, hex, rgb){
-                       redraw('color1', '#'+hex);
+                       redraw('color2', '#'+hex);
                    }
                })
                .bind('keyup', function(){
@@ -341,14 +358,18 @@
             	// assemble color
             	if(option == 'color1') {
             	   top_color = hex;
+            	   $('#color1').val(hex);
        				bottom_color = $('#color2').val();       				
             	} else if (option == 'color2') {
        				top_color = $('#color1').val();
-       				bottom_color = hex;            	   
+       				bottom_color = hex;   
+       				$('#color2').val(hex);         	   
             	} else {
        				top_color = $('#color1').val();
        				bottom_color = $('#color2').val();
        			}
+       			
+       		//	alert($('#color1').val() + "   " + $('#color2').val());
                
                //  set new chart values
                mainChart.laneSizes = parseInt(laneSizes);
@@ -529,10 +550,16 @@
           		   reader.onload = function(event) {
           		      mainChart.laneSizes = 13;
           				if (fileType == "bed") {
-          					mainChart.loadBed(event.target.result);
+          					try {mainChart.loadBed(event.target.result);}
+          					catch(err) {
+          					   alert(err);
+          					}
           					enableControls();
           				} else if (fileType == "gb") {
-          					mainChart.loadGenbank(event.target.result);
+          					try {mainChart.loadGenbank(event.target.result);}
+          					catch(err) {
+          					   alert(err);
+          					}
           					enableControls();
           				} else
           				 	alert("File must have a .gb or .bed extension");

@@ -4,8 +4,8 @@
 <head> 
 
    <title></title> 
-   <script src="js/Scribl.1.1.5.min.js"></script>  
-   <!-- <script src="../Scribl/src/Scribl.class.js" ></script>
+   <!-- <script src="js/Scribl.1.1.5.min.js"></script>   -->
+   <script src="../Scribl/src/Scribl.class.js" ></script>
    <script src="../Scribl/src/Scribl.js" ></script>
    <script src="../Scribl/src/Scribl.track.js" ></script>
    <script src="../Scribl/src/Scribl.lane.js" ></script>
@@ -20,7 +20,7 @@
    <script src="../Scribl/src/glyph/Scribl.line.js" ></script>
    <script src="../Scribl/src/glyph/Scribl.complex.js" ></script>
    <script src="../Scribl/src/parsers/bed.js" ></script>
-   <script src="../Scribl/src/parsers/genbank.js" ></script> -->
+   <script src="../Scribl/src/parsers/genbank.js" ></script>
    <link rel="stylesheet" type="text/css" href="demos.css" />         
    <script src="js/jquery.min.js"></script>
    <script src="js/jquery-ui.chase.min.js"></script>
@@ -60,7 +60,7 @@
                $("#scaleSlider").slider('disable');
           		$("#shapeSlider").slider( { min: 1, max: 20, value: 6, slide: function(event, ui){ redraw('featureShape') } });
           		$("#shapeSlider").slider('disable');
-          		$("#trackSlider").slider( { min: 1, max: 200, value: 13, slide: function(event, ui){ redraw('laneSize') } });
+          		$("#trackSlider").slider( { min: 5, max: 200, value: 20, slide: function(event, ui){ redraw('laneSize') } });
           		$("#trackSlider").slider('disable');
                // $('#color1').bind('colorpicked', function () { redraw('color1'); });
                // $('#color2').bind('colorpicked', function () { redraw('color2'); });
